@@ -3,72 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>נגן מוזיקה יהודית</title>
+    <title>נגן מוזיקה יהודית - KCM</title>
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --accent-color: #3498db;
-            --text-color: #333;
-            --bg-color: #f4f4f9;
+            --primary: #e74c3c; /* צבע אדום בסגנון קול חי */
+            --dark: #2c3e50;
+            --light: #ecf0f1;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: #f4f4f9;
             margin: 0;
             padding: 20px;
             text-align: center;
-        }
-
-        header {
-            margin-bottom: 40px;
-        }
-
-        h1 {
-            color: var(--primary-color);
+            color: var(--dark);
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
-            display: grid;
-            gap: 20px;
         }
 
-        .card {
+        h1 { margin-bottom: 10px; }
+        
+        /* עיצוב אזור הרדיו */
+        .radio-box {
             background: white;
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        h2 {
-            margin-top: 0;
+        .now-playing {
             font-size: 1.2rem;
-            color: var(--accent-color);
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--primary);
         }
 
         audio {
             width: 100%;
-            margin-top: 10px;
-            outline: none;
+            margin-bottom: 20px;
+            border-radius: 30px;
         }
 
-        .video-container {
+        .channels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .channel-btn {
+            background-color: var(--light);
+            border: 2px solid transparent;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .channel-btn:hover {
+            background-color: #dfe6e9;
+            transform: translateY(-2px);
+        }
+
+        .channel-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+        }
+
+        /* עיצוב אזור היוטיוב */
+        .youtube-box {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .video-wrapper {
             position: relative;
-            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            padding-bottom: 56.25%; /* 16:9 */
             height: 0;
             overflow: hidden;
-            border-radius: 8px;
+            border-radius: 10px;
+            background: #000;
         }
 
-        .video-container iframe {
+        .video-wrapper iframe {
             position: absolute;
             top: 0;
             left: 0;
@@ -76,42 +101,56 @@
             height: 100%;
         }
 
-        footer {
-            margin-top: 50px;
-            font-size: 0.9rem;
-            color: #666;
+        .input-group {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 60%;
+        }
+
+        button.load-btn {
+            padding: 10px 20px;
+            background-color: var(--dark);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>🎵 פורטל המוזיקה שלי</h1>
-        <p>רדיו בשידור חי ופלייליסטים</p>
-    </header>
-
     <div class="container">
-        
-        <div class="card">
-            <h2>📻 קול חי מיוזיק</h2>
-            <audio controls preload="none">
-                <source src="https://stream.kol-chai.co.il/kcmusic" type="audio/mpeg">
-                הדפדפן שלך לא תומך בנגן זה.
+        <h1>🎵 המנגן שלי</h1>
+        <p>האזנה לערוצי קול חי ויוטיוב</p>
+
+        <div class="radio-box">
+            <div class="now-playing" id="stationName">בחר תחנה להאזנה</div>
+            
+            <audio id="mainAudio" controls>
+                הדפדפן שלך לא תומך באודיו.
             </audio>
+
+            <div class="channels-grid">
+                <button class="channel-btn" onclick="playStream('https://stream.kol-chai.co.il/kcmusic', 'קול חי מיוזיק - ראשי', this)">מיוזיק ראשי</button>
+                <button class="channel-btn" onclick="playStream('https://stream.kol-chai.co.il/kcm-simcha', 'קול חי - שמחה', this)">ערוץ שמחה</button>
+                <button class="channel-btn" onclick="playStream('https://stream.kol-chai.co.il/kcm-regesh', 'קול חי - רגש', this)">ערוץ רגש</button>
+                <button class="channel-btn" onclick="playStream('https://stream.kol-chai.co.il/kcm-vocal', 'קול חי - ווקאלי', this)">ערוץ ווקאלי</button>
+                <button class="channel-btn" onclick="playStream('https://kollive.xpco.net/kolplay', 'קול פליי', this)">קול פליי</button>
+            </div>
         </div>
 
-        <div class="card">
-            <h2>📻 קול פליי</h2>
-            <audio controls preload="none">
-                <source src="https://kollive.xpco.net/kolplay" type="audio/mpeg">
-                הדפדפן שלך לא תומך בנגן זה.
-            </audio>
-        </div>
-
-        <div class="card">
-            <h2>▶️ פלייליסט נבחר</h2>
-            <div class="video-container">
-                <iframe 
+        <div class="youtube-box">
+            <h3>📺 פלייליסט יוטיוב</h3>
+            <div class="video-wrapper">
+                <iframe id="ytPlayer" 
                     src="https://www.youtube.com/embed/videoseries?list=PLwLsw1_eXPxu3r4R_qjZ5X7qBqFk9_xJ_" 
                     title="YouTube video player" 
                     frameborder="0" 
@@ -119,8 +158,52 @@
                     allowfullscreen>
                 </iframe>
             </div>
+            
+            <div class="input-group">
+                <input type="text" id="playlistInput" placeholder="הדבק כאן ID של פלייליסט (למשל: PL...)">
+                <button class="load-btn" onclick="loadPlaylist()">טען פלייליסט</button>
+            </div>
+            <small style="color: #777; display: block; margin-top: 5px;">
+                הסבר: העתק מיוטיוב רק את החלק שאחרי ה-list=
+            </small>
         </div>
-
     </div>
 
-    <footer>
+    <script>
+        // פונקציה לניגון רדיו
+        function playStream(url, name, btnElement) {
+            var audio = document.getElementById('mainAudio');
+            var title = document.getElementById('stationName');
+            
+            // עדכון הנגן
+            audio.src = url;
+            title.innerText = "מנגן כעת: " + name;
+            audio.play();
+
+            // עדכון עיצוב הכפתורים
+            var buttons = document.querySelectorAll('.channel-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
+
+        // פונקציה לטעינת פלייליסט יוטיוב
+        function loadPlaylist() {
+            var input = document.getElementById('playlistInput').value;
+            var player = document.getElementById('ytPlayer');
+            
+            // בדיקה אם המשתמש הכניס כתובת מלאה או רק ID
+            var playlistId = input;
+            if (input.includes('list=')) {
+                playlistId = input.split('list=')[1].split('&')[0];
+            }
+
+            if (playlistId) {
+                player.src = "https://www.youtube.com/embed/videoseries?list=" + playlistId;
+            } else {
+                alert("אנא הכנס מזהה פלייליסט תקין");
+            }
+        }
+    </script>
+
+</body>
+</html>
