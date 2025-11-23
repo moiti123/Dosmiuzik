@@ -19,6 +19,7 @@
             --radius: 8px;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             --danger: #d32f2f;
+            --success: #107c10;
         }
 
         [data-theme="dark"] {
@@ -79,8 +80,21 @@
         .header-tools { display: flex; align-items: center; gap: 15px; font-size: 0.9rem; }
         .icon-btn { background: none; border: none; cursor: pointer; color: var(--text); font-size: 1.1rem; padding: 5px; border-radius: 4px; transition: 0.2s; }
         .icon-btn:hover { background: rgba(128,128,128,0.2); }
+        
+        .live-counter {
+            background: rgba(255, 0, 0, 0.1);
+            color: var(--danger);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: flex; align-items: center; gap: 5px;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+        }
+        .live-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        /* --- אזור עליון (חיפוש וסימניות) --- */
+        /* --- אזור עליון --- */
         .top-section {
             flex: 0 0 auto;
             padding: 20px 20px 0 20px;
@@ -121,7 +135,7 @@
             flex: 1;
             padding: 20px;
             display: grid;
-            grid-template-columns: 300px 1fr 250px; /* רדיו | וידאו | פרסומות */
+            grid-template-columns: 300px 1fr 250px; 
             gap: 20px;
             overflow: hidden;
         }
@@ -142,22 +156,38 @@
         .video-container { flex: 1; background: #000; border-radius: 4px; overflow: hidden; }
         iframe { width: 100%; height: 100%; border: none; }
         
-        /* משבצת פרסומות */
+        /* משבצת פרסומות וקשר */
         .ads-panel {
             text-align: center;
-            background: rgba(255,255,255,0.5);
+            background: var(--mica-bg);
             display: flex; flex-direction: column;
+            gap: 10px;
+            padding-bottom: 10px;
         }
-        .ad-content {
+        .ad-box {
             flex: 1;
             display: flex; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.05);
-            margin: 10px; border-radius: 4px; border: 1px dashed #aaa;
-            font-size: 0.9rem; color: #777;
+            background: var(--surface);
+            margin: 10px 10px 0 10px; border-radius: 4px; border: 1px solid var(--mica-border);
             overflow: hidden;
+            position: relative;
         }
-        /* לדוגמה אם תרצה לשים תמונה */
-        .ad-content img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        /* כאן שמים את התמונה שלך */
+        .ad-image { width: 100%; height: 100%; object-fit: cover; }
+        
+        .contact-btn {
+            background: #25D366; /* צבע וואטסאפ */
+            color: white;
+            text-decoration: none;
+            padding: 8px;
+            margin: 0 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: 0.2s;
+        }
+        .contact-btn:hover { background: #128C7E; transform: scale(1.02); }
 
         /* Footer Ticker */
         .news-footer {
@@ -192,11 +222,11 @@
         @media (max-width: 900px) {
             .main-grid {
                 grid-template-columns: 1fr;
-                grid-template-rows: auto 400px auto; /* רדיו, וידאו, פרסומות */
+                grid-template-rows: auto 400px auto; 
                 overflow-y: auto; display: flex; flex-direction: column;
             }
             .radio-section, .video-section, .ads-panel { min-height: 300px; flex: none; }
-            .ads-panel { height: 150px; }
+            .ads-panel { height: 200px; }
         }
     </style>
 </head>
@@ -207,8 +237,14 @@
         <div class="icon-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></div>
         <div class="icon-btn" onclick="openSettings()"><i class="fas fa-cog"></i> הגדרות</div>
         <div style="width:1px; height:20px; background:#ccc; margin:0 5px;"></div>
+        
+        <div class="live-counter" title="משתמשים מחוברים כעת">
+            <div class="live-dot"></div>
+            <span id="userCount">142</span> מאזינים
+        </div>
+
+        <div style="width:1px; height:20px; background:#ccc; margin:0 5px;"></div>
         <div id="clock" style="font-weight:600;">00:00</div>
-        <div id="weather" style="font-size:0.9rem; cursor:pointer;" onclick="openSettings()">טוען...</div>
     </div>
     <div style="font-weight:700; color:var(--primary);">Windows Station</div>
 </header>
@@ -219,8 +255,7 @@
         <input type="text" id="googleQuery" class="search-input" placeholder="חפש בגוגל..." required>
     </form>
 
-    <div class="bookmarks-bar" id="bookmarksContainer">
-        </div>
+    <div class="bookmarks-bar" id="bookmarksContainer"></div>
 </div>
 
 <div class="main-grid">
@@ -258,16 +293,21 @@
     </div>
 
     <div class="glass-panel ads-panel">
-        <div class="panel-header">פרסומות</div>
-        <div class="ad-content">
-            <div>
-                <h3>שטח לפרסום</h3>
-                <p>צור קשר לפרטים</p>
-                <i class="fas fa-ad" style="font-size:2rem; opacity:0.3;"></i>
+        <div class="panel-header">פרסום וחסות</div>
+        
+        <div class="ad-box">
+            <img src="https://images.unsplash.com/photo-1557264337-e8a93017fe92?q=80&w=600" class="ad-image" alt="פרסומת">
+            <div style="position:absolute; bottom:10px; background:rgba(0,0,0,0.6); color:white; padding:5px 10px; border-radius:20px; font-size:0.8rem;">
+                השטח שלך לפרסום
             </div>
         </div>
-        <div class="ad-content" style="flex:0 0 100px;">
-            <small>באנר תחתון</small>
+
+        <a href="https://wa.me/972500000000?text=שלום, אני מעוניין לפרסם באתר שלך" target="_blank" class="contact-btn">
+            <i class="fab fa-whatsapp"></i> לחץ כאן לפרסום באתר
+        </a>
+        
+        <div style="font-size:0.8rem; opacity:0.7;">
+            דוא"ל: example@email.com
         </div>
     </div>
 </div>
@@ -377,7 +417,6 @@
         const ch = myChannels[idx];
         document.getElementById('nowPlaying').innerText = "מנגן: " + ch.name;
         
-        // סימון ויזואלי
         document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
         document.getElementById('channelsList').children[idx].classList.add('active');
 
@@ -400,7 +439,6 @@
         else { audio.pause(); document.getElementById('playIcon').className = "fas fa-play"; }
     }
 
-    // ניהול הוספת ערוצים
     function openAddChannel() { document.getElementById('addChannelModal').style.display = 'flex'; }
     function saveNewChannel() {
         const name = document.getElementById('newChName').value;
@@ -435,7 +473,6 @@
             `;
             container.appendChild(a);
         });
-        // כפתור הוספה
         const addBtn = document.createElement('div');
         addBtn.className = 'bookmark-chip bookmark-add';
         addBtn.innerHTML = '<i class="fas fa-plus"></i> הוסף';
@@ -458,7 +495,7 @@
     }
     
     function deleteBookmark(e, idx) {
-        e.preventDefault(); // למנוע לחיצה על הקישור
+        e.preventDefault();
         if(confirm('למחוק סימניה זו?')) {
             myBookmarks.splice(idx, 1);
             saveData();
@@ -466,7 +503,7 @@
         }
     }
 
-    // --- הגדרות מערכת (עיר ורקע) ---
+    // --- הגדרות מערכת ---
     function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
     function saveSettings() {
         mySettings.city = document.getElementById('citySelect').value;
@@ -476,7 +513,6 @@
     }
     
     async function applySettings() {
-        // יישום רקע
         if(mySettings.bg) document.body.style.backgroundImage = `url('${mySettings.bg}')`;
         document.getElementById('bgSelect').value = mySettings.bg || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920";
         document.getElementById('citySelect').value = mySettings.city;
@@ -490,36 +526,44 @@
             "Safed": {lat:32.9646, lon:35.4960}
         };
         const coords = cities[mySettings.city];
-        try {
-            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current_weather=true`);
-            const data = await res.json();
-            document.getElementById('weather').innerText = `${Math.round(data.current_weather.temperature)}°C`;
-        } catch(e) { document.getElementById('weather').innerText = "--"; }
+        // כאן ניתן להוסיף קריאת API למזג אוויר אם רוצים
     }
 
-    // --- חדשות הגזרה (RSS to JSON) ---
+    // --- חדשות הגזרה ---
     async function fetchNews() {
         const ticker = document.getElementById('newsTicker');
         try {
-            // שימוש בפרוקסי להמיר RSS ל-JSON כדי לעקוף חסימת דפדפן (CORS)
             const proxyUrl = "https://api.rss2json.com/v1/api.json?rss_url=https://hagizra.news/feed/";
             const res = await fetch(proxyUrl);
             const data = await res.json();
             
             if(data.status === 'ok' && data.items.length > 0) {
                 const titles = data.items.map(item => `• ${item.title}`).join('   ');
-                // שכפול הטקסט כדי ליצור רצף
                 ticker.innerText = titles + "   " + titles;
             } else {
                 ticker.innerText = "לא ניתן לטעון חדשות כרגע (נסה שוב מאוחר יותר) • ברוכים הבאים למערכת";
             }
         } catch(e) {
             ticker.innerText = "הגזרה: המערכת מנסה להתחבר לשרת החדשות... • עדכוני מזג אוויר ומוזיקה פעילים כרגיל";
-            console.error("News Error:", e);
         }
     }
 
-    // --- כללי ---
+    // --- סימולטור מאזינים (מזויף אך אמין) ---
+    function simulateUsers() {
+        // מתחיל עם מספר רנדומלי בין 120 ל-160
+        let count = Math.floor(Math.random() * (160 - 120 + 1) + 120);
+        const el = document.getElementById('userCount');
+        
+        setInterval(() => {
+            // שינוי קטן כל כמה שניות (פלוס/מינוס 3)
+            const change = Math.floor(Math.random() * 7) - 3; 
+            count += change;
+            if(count < 100) count = 105; // שלא ירד מדי
+            if(count > 200) count = 195; // שלא יעלה מדי
+            el.innerText = count;
+        }, 4000);
+    }
+
     function toggleTheme() {
         const body = document.body;
         body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
@@ -535,12 +579,12 @@
         document.getElementById('youtubeFrame').src = 'https://www.youtube.com/embed?listType=search&list=' + encodeURIComponent(term);
     }
 
-    // אתחול
     window.onload = () => {
         renderChannels();
         renderBookmarks();
         applySettings();
-        fetchNews(); // הפעלת החדשות
+        fetchNews();
+        simulateUsers(); // הפעלת מונה המאזינים
         
         setInterval(() => {
             document.getElementById('clock').innerText = new Date().toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
