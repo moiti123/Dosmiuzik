@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>נגן מוזיקה יהודית - KCM</title>
+    <title>הנגן היהודי - KCM & YouTube</title>
     <style>
         :root {
-            --primary: #e74c3c; /* צבע אדום בסגנון קול חי */
-            --dark: #2c3e50;
+            --primary: #d35400; /* כתום כהה */
+            --secondary: #2c3e50;
             --light: #ecf0f1;
+            --accent: #3498db;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f9;
+            background-color: #f0f2f5;
             margin: 0;
             padding: 20px;
             text-align: center;
-            color: var(--dark);
+            color: var(--secondary);
         }
 
         .container {
@@ -25,72 +26,77 @@
             margin: 0 auto;
         }
 
-        h1 { margin-bottom: 10px; }
+        h1 { margin-bottom: 5px; color: var(--secondary); }
+        p.subtitle { color: #7f8c8d; margin-bottom: 30px; }
         
-        /* עיצוב אזור הרדיו */
-        .radio-box {
+        /* --- אזור הרדיו --- */
+        .card {
             background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 30px;
         }
 
-        .now-playing {
+        .card-header {
+            border-bottom: 2px solid #f1f1f1;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
             font-size: 1.2rem;
             font-weight: bold;
-            margin-bottom: 15px;
             color: var(--primary);
         }
 
         audio {
             width: 100%;
             margin-bottom: 20px;
-            border-radius: 30px;
+            border-radius: 50px;
+            background-color: #f1f3f4;
         }
 
-        .channels-grid {
+        .grid-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 12px;
         }
 
-        .channel-btn {
-            background-color: var(--light);
-            border: 2px solid transparent;
-            padding: 10px;
-            border-radius: 8px;
+        .btn {
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 0.9rem;
         }
 
-        .channel-btn:hover {
-            background-color: #dfe6e9;
-            transform: translateY(-2px);
+        /* כפתורי רדיו */
+        .radio-btn {
+            background-color: #fff;
+            border: 2px solid #e0e0e0;
+            color: var(--secondary);
         }
 
-        .channel-btn.active {
+        .radio-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .radio-btn.active {
             background-color: var(--primary);
             color: white;
-            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+            border-color: var(--primary);
         }
 
-        /* עיצוב אזור היוטיוב */
-        .youtube-box {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
+        /* --- אזור יוטיוב --- */
         .video-wrapper {
             position: relative;
             padding-bottom: 56.25%; /* 16:9 */
             height: 0;
             overflow: hidden;
-            border-radius: 10px;
+            border-radius: 12px;
             background: #000;
+            margin-bottom: 20px;
         }
 
         .video-wrapper iframe {
@@ -101,56 +107,60 @@
             height: 100%;
         }
 
-        .input-group {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        input {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 60%;
-        }
-
-        button.load-btn {
-            padding: 10px 20px;
-            background-color: var(--dark);
+        /* כפתורי תגיות יוטיוב */
+        .tag-btn {
+            background-color: var(--accent);
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .tag-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .manual-input {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        
+        .input-box {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            width: 60%;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>🎵 המנגן שלי</h1>
-        <p>האזנה לערוצי קול חי ויוטיוב</p>
+        <h1>🎵 הנגן היהודי</h1>
+        <p class="subtitle">רדיו בשידור חי ופלייליסטים לפי אווירה</p>
 
-        <div class="radio-box">
-            <div class="now-playing" id="stationName">בחר תחנה להאזנה</div>
+        <div class="card">
+            <div class="card-header">📻 ערוצי רדיו (קול חי & קול פליי)</div>
             
-            <audio id="mainAudio" controls>
+            <div id="playerStatus" style="margin-bottom: 10px;">בחר ערוץ לניגון</div>
+            <audio id="radioPlayer" controls>
                 הדפדפן שלך לא תומך באודיו.
             </audio>
 
-            <div class="channels-grid">
-                <button class="channel-btn" onclick="playStream('https://stream.kol-chai.co.il/kcmusic', 'קול חי מיוזיק - ראשי', this)">מיוזיק ראשי</button>
-                <button class="channel-btn" onclick="playStream('https://stream.kol-chai.co.il/kcm-simcha', 'קול חי - שמחה', this)">ערוץ שמחה</button>
-                <button class="channel-btn" onclick="playStream('https://stream.kol-chai.co.il/kcm-regesh', 'קול חי - רגש', this)">ערוץ רגש</button>
-                <button class="channel-btn" onclick="playStream('https://stream.kol-chai.co.il/kcm-vocal', 'קול חי - ווקאלי', this)">ערוץ ווקאלי</button>
-                <button class="channel-btn" onclick="playStream('https://kollive.xpco.net/kolplay', 'קול פליי', this)">קול פליי</button>
+            <div class="grid-buttons">
+                <button class="btn radio-btn" onclick="playRadio('https://live.media-cast.co.il/kol-chai/kcmusic/icecast.audio', 'מיוזיק ראשי', this)">מיוזיק ראשי</button>
+                <button class="btn radio-btn" onclick="playRadio('https://live.media-cast.co.il/kol-chai/kcm-simcha/icecast.audio', 'ערוץ שמחה', this)">שמחה</button>
+                <button class="btn radio-btn" onclick="playRadio('https://live.media-cast.co.il/kol-chai/kcm-regesh/icecast.audio', 'ערוץ רגש', this)">רגש</button>
+                <button class="btn radio-btn" onclick="playRadio('https://live.media-cast.co.il/kol-chai/kcm-vocal/icecast.audio', 'ערוץ ווקאלי', this)">ווקאלי</button>
+                <button class="btn radio-btn" onclick="playRadio('https://kollive.xpco.net/kolplay', 'קול פליי', this)">קול פליי</button>
             </div>
         </div>
 
-        <div class="youtube-box">
-            <h3>📺 פלייליסט יוטיוב</h3>
+        <div class="card">
+            <div class="card-header">📺 פלייליסטים לפי אווירה</div>
+            
             <div class="video-wrapper">
-                <iframe id="ytPlayer" 
+                <iframe id="ytFrame" 
                     src="https://www.youtube.com/embed/videoseries?list=PLwLsw1_eXPxu3r4R_qjZ5X7qBqFk9_xJ_" 
                     title="YouTube video player" 
                     frameborder="0" 
@@ -158,49 +168,57 @@
                     allowfullscreen>
                 </iframe>
             </div>
-            
-            <div class="input-group">
-                <input type="text" id="playlistInput" placeholder="הדבק כאן ID של פלייליסט (למשל: PL...)">
-                <button class="load-btn" onclick="loadPlaylist()">טען פלייליסט</button>
+
+            <p style="font-size:0.9rem; margin-bottom:10px;">בחר סגנון:</p>
+            <div class="grid-buttons">
+                <button class="btn tag-btn" onclick="setPlaylist('PLwLsw1_eXPxu3r4R_qjZ5X7qBqFk9_xJ_', 'להיטים חמים')">🔥 להיטים</button>
+                <button class="btn tag-btn" onclick="setPlaylist('PLMcj5CjMySS9bFvF_OVUwsOU1MrLJDHeS', 'שירי שבת')">🕯️ שבת רגוע</button>
+                <button class="btn tag-btn" onclick="setPlaylist('PLMcj5CjMySS-CqUUs_nC-F_Y_gCJM4IR1', 'חסידי אותנטי')">🎻 חסידי</button>
+                <button class="btn tag-btn" onclick="setPlaylist('PLMcj5CjMySS9zC2XEIAiLGP4IU8ZlC4hZ', 'מזרחי נשמה')">🕌 מזרחי</button>
+                <button class="btn tag-btn" onclick="setPlaylist('PLbdID6aP3WBeFq0-5w2zD5izR4fIBP_55', 'חנוכה')">🍩 חנוכה</button>
             </div>
-            <small style="color: #777; display: block; margin-top: 5px;">
-                הסבר: העתק מיוטיוב רק את החלק שאחרי ה-list=
-            </small>
+
+            <div class="manual-input">
+                <small>רוצה פלייליסט אחר? הדבק כאן ID:</small><br>
+                <input type="text" id="customInput" class="input-box" placeholder="למשל: PLxxxx...">
+                <button class="btn tag-btn" style="padding: 8px 15px;" onclick="loadCustom()">טען</button>
+            </div>
         </div>
+
     </div>
 
     <script>
-        // פונקציה לניגון רדיו
-        function playStream(url, name, btnElement) {
-            var audio = document.getElementById('mainAudio');
-            var title = document.getElementById('stationName');
+        // לוגיקה לרדיו
+        function playRadio(url, name, btn) {
+            var audio = document.getElementById('radioPlayer');
+            var status = document.getElementById('playerStatus');
             
-            // עדכון הנגן
             audio.src = url;
-            title.innerText = "מנגן כעת: " + name;
-            audio.play();
+            audio.play().catch(e => {
+                alert('שגיאה בטעינת הזרם. ייתכן שהתחנה לא משדרת כרגע או שיש חסימת רשת.');
+            });
 
-            // עדכון עיצוב הכפתורים
-            var buttons = document.querySelectorAll('.channel-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
+            status.innerText = "מנגן כעת: " + name;
+
+            // איפוס עיצוב כפתורים
+            document.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         }
 
-        // פונקציה לטעינת פלייליסט יוטיוב
-        function loadPlaylist() {
-            var input = document.getElementById('playlistInput').value;
-            var player = document.getElementById('ytPlayer');
-            
-            // בדיקה אם המשתמש הכניס כתובת מלאה או רק ID
-            var playlistId = input;
-            if (input.includes('list=')) {
-                playlistId = input.split('list=')[1].split('&')[0];
-            }
+        // לוגיקה ליוטיוב
+        function setPlaylist(id, name) {
+            var frame = document.getElementById('ytFrame');
+            frame.src = "https://www.youtube.com/embed/videoseries?list=" + id;
+        }
 
-            if (playlistId) {
-                player.src = "https://www.youtube.com/embed/videoseries?list=" + playlistId;
-            } else {
-                alert("אנא הכנס מזהה פלייליסט תקין");
+        function loadCustom() {
+            var input = document.getElementById('customInput').value;
+            // חילוץ ה-ID אם המשתמש הדביק קישור מלא
+            if(input.includes('list=')) {
+                input = input.split('list=')[1].split('&')[0];
+            }
+            if(input) {
+                setPlaylist(input, 'מותאם אישית');
             }
         }
     </script>
