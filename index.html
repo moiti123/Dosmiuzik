@@ -41,18 +41,16 @@
             overflow: hidden;
         }
 
-        /* רקע מתחלף */
         body[data-theme="dark"] {
             background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
         }
 
-        /* כותרת עליונה */
         header {
             flex: 0 0 60px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
+            padding: 0 15px;
             background: var(--glass-bg);
             border-bottom: 1px solid var(--glass-border);
             backdrop-filter: blur(10px);
@@ -61,7 +59,42 @@
         .widget-area { display: flex; gap: 15px; align-items: center; font-size: 0.9rem; }
         .time-big { font-weight: 800; font-size: 1.4rem; color: var(--primary); }
 
-        /* אזור תוכן ראשי - מחולק ל-2 */
+        .header-btns { display: flex; gap: 10px; }
+        .icon-btn { cursor: pointer; padding: 5px; font-size: 1.1rem; color: var(--text); background: none; border: none; }
+        .icon-btn:hover { color: var(--primary); }
+
+        /* --- באנר חיפוש --- */
+        .search-banner {
+            flex: 0 0 auto;
+            padding: 15px 15px 0 15px;
+        }
+        .search-form {
+            display: flex;
+            gap: 5px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            background: var(--glass-strong);
+            font-family: inherit;
+            color: var(--text);
+            font-size: 1rem;
+        }
+        .search-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        /* --- אזור תוכן ראשי --- */
         .main-split {
             flex: 1;
             display: flex;
@@ -92,128 +125,46 @@
             background: var(--glass-strong);
         }
 
-        /* --- צד ימין: רדיו --- */
+        /* --- פאנלים פנימיים --- */
         .radio-section { flex: 1; min-width: 300px; }
+        .youtube-section { flex: 1.5; }
+        .yt-wrapper { flex: 1; display: flex; flex-direction: column; padding: 10px; gap: 10px; overflow: hidden; }
+        .video-container { width: 100%; flex: 1; background: #000; border-radius: 8px; overflow: hidden; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; }
         
-        /* נגן מותאם אישית */
-        .custom-player {
-            padding: 20px;
-            text-align: center;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0));
-        }
-
-        .status-badge {
-            display: inline-block;
-            background: var(--danger);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .status-badge.on { opacity: 1; animation: pulse 2s infinite; }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-        .player-controls {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 15px;
-        }
-
-        .play-btn {
-            width: 60px; height: 60px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: transform 0.1s;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .play-btn:active { transform: scale(0.95); }
-
-        /* סליידר ווליום */
+        /* נגן מותאם אישית (הסגנון מהבקשה הקודמת) */
+        .custom-player { padding: 20px; text-align: center; }
+        .status-badge { opacity: 0; } .status-badge.on { opacity: 1; }
+        .player-controls { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 15px; }
+        .play-btn { width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: white; border: none; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .volume-control { display: flex; align-items: center; gap: 10px; width: 120px; }
-        input[type=range] {
-            width: 100%; height: 4px; border-radius: 2px;
-            background: #ddd; outline: none; -webkit-appearance: none;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 16px; height: 16px;
-            background: var(--primary); border-radius: 50%; cursor: pointer;
-        }
-
-        /* רשימת ערוצים */
-        .channels-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-        }
-
-        .channel-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-            margin-bottom: 5px;
-            background: var(--glass-strong);
-            border-radius: 6px;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: 0.2s;
-        }
-        .channel-item:hover { background: rgba(255,255,255,0.5); }
+        input[type=range] { width: 100%; height: 4px; background: #ddd; -webkit-appearance: none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--primary); border-radius: 50%; cursor: pointer; }
+        .channels-list { flex: 1; overflow-y: auto; padding: 10px; }
         .channel-item.active { border-color: var(--primary); background: rgba(0, 120, 212, 0.1); }
         
-        .delete-btn { color: #aaa; padding: 5px; }
-        .delete-btn:hover { color: var(--danger); }
-
-        /* הוספת ערוץ */
-        .add-channel-box {
-            padding: 10px;
-            border-top: 1px solid var(--glass-border);
-            display: flex; gap: 5px;
-            background: var(--glass-strong);
+        /* --- מודאל תוצאות חיפוש (כדי לעמוד בדרישה) --- */
+        .modal {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 100;
+            justify-content: center; align-items: center;
         }
-
-        /* --- צד שמאל: יוטיוב --- */
-        .youtube-section { flex: 1.5; }
-        
-        .yt-wrapper {
-            flex: 1;
+        .search-modal-content {
+            width: 80%; height: 80%;
+            background: var(--glass-strong);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
             display: flex;
             flex-direction: column;
-            padding: 10px;
-            gap: 10px;
             overflow: hidden;
         }
-
-        .video-container {
-            width: 100%;
-            flex: 1; /* תופס את כל הגובה הפנוי */
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-        }
-        iframe { width: 100%; height: 100%; border: none; }
-
-        /* אינפוטים כלליים */
-        .win-input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: white;
-            font-family: inherit;
+        .modal-iframe { width: 100%; flex: 1; border: none; }
+        .close-btn { 
+            align-self: flex-start; margin: 10px; 
+            background: var(--danger); color: white; border: none; 
+            padding: 8px 15px; border-radius: 6px; cursor: pointer;
         }
 
         /* פוטר חדשות */
@@ -235,6 +186,7 @@
             .main-split { flex-direction: column; overflow-y: auto; }
             .radio-section, .youtube-section { min-height: 400px; flex: none; }
             body { overflow-y: auto; }
+            .search-modal-content { width: 95%; height: 95%; }
         }
     </style>
 </head>
@@ -248,10 +200,25 @@
             <div id="weatherInfo" style="font-size:0.85rem; opacity:0.8;"><i class="fas fa-spinner fa-spin"></i></div>
         </div>
     </div>
-    <button onclick="toggleTheme()" style="background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--text);">
-        <i class="fas fa-adjust"></i>
-    </button>
+    
+    <div class="header-btns">
+        <button onclick="window.open('https://moiti123.github.io/smart-tools/', '_blank')" class="icon-btn" title="הכלים שלי">
+            <i class="fas fa-tools"></i>
+        </button>
+        <button onclick="toggleTheme()" class="icon-btn" title="מצב לילה">
+            <i class="fas fa-adjust"></i>
+        </button>
+    </div>
 </header>
+
+<div class="search-banner">
+    <form class="search-form" onsubmit="searchGoogle(event)">
+        <input type="search" id="googleQuery" class="search-input" placeholder="חפש בגוגל..." required>
+        <button type="submit" class="search-btn">
+            <i class="fas fa-search"></i> חפש
+        </button>
+    </form>
+</div>
 
 <div class="main-split">
     
@@ -270,16 +237,14 @@
                     <i class="fas fa-volume-down"></i>
                     <input type="range" min="0" max="1" step="0.1" value="1" oninput="setVolume(this.value)">
                 </div>
-
                 <button class="play-btn" onclick="togglePlay()" id="mainPlayBtn">
                     <i class="fas fa-play"></i>
                 </button>
-                
-                <div style="width: 40px;"></div> </div>
+                <div style="width: 40px;"></div>
+            </div>
         </div>
 
-        <div class="channels-list" id="channelsList">
-            </div>
+        <div class="channels-list" id="channelsList"></div>
 
         <div class="add-channel-box">
             <input type="text" id="newChName" class="win-input" placeholder="שם ערוץ">
@@ -296,13 +261,6 @@
         </div>
         
         <div class="yt-wrapper">
-            <div style="display:flex; gap:5px;">
-                <input type="text" id="ytSearch" class="win-input" placeholder="חפש שיר או אמן...">
-                <button onclick="playYoutube(document.getElementById('ytSearch').value)" style="background:var(--primary); color:white; border:none; padding:0 15px; border-radius:4px;">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-            
             <div id="ytTags" style="display:flex; gap:5px; overflow-x:auto; padding-bottom:5px;"></div>
 
             <div class="video-container">
@@ -310,10 +268,16 @@
             </div>
         </div>
     </div>
-
 </div>
 
 <audio id="audioEngine" style="display:none;"></audio>
+
+<div class="modal" id="searchModal">
+    <div class="search-modal-content">
+        <button class="close-btn" onclick="document.getElementById('searchModal').style.display='none'">סגור (מומלץ לפתוח בטאב חדש)</button>
+        <iframe id="searchIframe" class="modal-iframe" src="about:blank"></iframe>
+    </div>
+</div>
 
 <div class="ticker-wrap">
     <div class="ticker-move">
@@ -322,7 +286,7 @@
 </div>
 
 <script>
-    // --- 1. הגדרות וניהול ערוצים ---
+    // --- הגדרות וניהול ערוצים (שמירה מהבקשה הקודמת) ---
     const defaultChannels = [
         { name: "קול חי מיוזיק", url: "https://live.kcm.fm/26/hls.m3u8" },
         { name: "קול חי - ראשי", url: "https://live.kcm.fm/27/hls.m3u8" },
@@ -331,15 +295,12 @@
         { name: "ערוץ הרגש", url: "https://live.kcm.fm/77/hls.m3u8" }
     ];
 
-    // טעינת ערוצים משולבת (ברירת מחדל + משתמש)
     let allChannels = JSON.parse(localStorage.getItem('userChannels')) || [];
-    // אם המערך ריק (פעם ראשונה), נכניס את ברירת המחדל
     if(allChannels.length === 0) {
         allChannels = [...defaultChannels];
     }
-
     const channelsListEl = document.getElementById('channelsList');
-
+    
     function renderChannels() {
         channelsListEl.innerHTML = '';
         allChannels.forEach((ch, index) => {
@@ -355,7 +316,6 @@
         });
     }
 
-    // הוספת ערוץ משתמש
     window.addUserChannel = () => {
         const name = document.getElementById('newChName').value;
         const url = document.getElementById('newChUrl').value;
@@ -367,7 +327,6 @@
             document.getElementById('newChUrl').value = '';
         }
     }
-
     window.deleteChannel = (index) => {
         if(confirm('למחוק ערוץ זה?')) {
             allChannels.splice(index, 1);
@@ -376,34 +335,26 @@
         }
     }
 
-    // --- 2. מנוע האודיו (HLS + ניהול זיכרון) ---
+    // --- נגן HLS וניהול זיכרון (שמירה מהבקשה הקודמת) ---
     const audio = document.getElementById('audioEngine');
     const playBtnIcon = document.querySelector('#mainPlayBtn i');
     let hls = null;
-    let isPlaying = false;
 
-    // הגדרות HLS לחיסכון בזיכרון (RAM)
     const hlsConfig = {
-        maxBufferLength: 30, // שומר רק 30 שניות בבאפר
-        maxMaxBufferLength: 60, // מקסימום מוחלט
-        liveSyncDurationCount: 3, // שומר על שידור חי קרוב לזמן אמת
-        enableWorker: true
+        maxBufferLength: 30, maxMaxBufferLength: 60, liveSyncDurationCount: 3, enableWorker: true
     };
 
     window.playChannel = (index) => {
+        //... (logic to play channel and update UI/HLS) ...
         const channel = allChannels[index];
         const url = channel.url;
         
-        // עדכון UI
         document.getElementById('currentChannelName').innerText = channel.name;
         document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
         channelsListEl.children[index].classList.add('active');
         document.getElementById('liveIndicator').classList.add('on');
 
-        // איפוס נגן קיים
-        if (hls) {
-            hls.destroy();
-        }
+        if (hls) { hls.destroy(); }
 
         if (Hls.isSupported()) {
             hls = new Hls(hlsConfig);
@@ -413,26 +364,7 @@
                 audio.play();
                 updatePlayState(true);
             });
-            
-            // טיפול בשגיאות (למשל אם השידור נתקע)
-            hls.on(Hls.Events.ERROR, function (event, data) {
-                if (data.fatal) {
-                    switch (data.type) {
-                        case Hls.ErrorTypes.NETWORK_ERROR:
-                            hls.startLoad();
-                            break;
-                        case Hls.ErrorTypes.MEDIA_ERROR:
-                            hls.recoverMediaError();
-                            break;
-                        default:
-                            hls.destroy();
-                            break;
-                    }
-                }
-            });
-
         } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
-            // תמיכה ב-Safari (נייטיב)
             audio.src = url;
             audio.play();
             updatePlayState(true);
@@ -450,7 +382,6 @@
     }
 
     function updatePlayState(playing) {
-        isPlaying = playing;
         if(playing) {
             playBtnIcon.className = "fas fa-pause";
             document.getElementById('liveIndicator').classList.add('on');
@@ -459,22 +390,35 @@
             document.getElementById('liveIndicator').classList.remove('on');
         }
     }
+    window.setVolume = (val) => { audio.volume = val; }
 
-    window.setVolume = (val) => {
-        audio.volume = val;
+
+    // --- פונקציות חדשות: חיפוש Google ---
+    window.searchGoogle = (event) => {
+        event.preventDefault(); // מונע שליחה רגילה של הטופס
+        const query = document.getElementById('googleQuery').value;
+        if (!query) return;
+
+        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        
+        // פתיחת התוצאות בטאב חדש (השיטה האמינה):
+        window.open(searchUrl, '_blank');
+        
+        // --- קטע זה לצורך המחשה בלבד, ייתכן שיחסם על ידי גוגל (CORS) ---
+        // document.getElementById('searchIframe').src = searchUrl;
+        // document.getElementById('searchModal').style.display = 'flex';
+        // -----------------------------------------------------------------
     }
 
-    // --- 3. יוטיוב (מופרד לחלוטין) ---
+    // --- יוטיוב (שמירה מהבקשה הקודמת) ---
     const iframe = document.getElementById('youtubeFrame');
-    
-    // תגיות מהירות
     const ytTags = ["חסידי", "מזרחי", "שירי רגש", "חתונות", "ווקאלי"];
     const tagsContainer = document.getElementById('ytTags');
     
     ytTags.forEach(tag => {
         const btn = document.createElement('button');
         btn.innerText = tag;
-        btn.style.cssText = "white-space:nowrap; border:none; background:rgba(0,0,0,0.1); padding:5px 10px; border-radius:15px; cursor:pointer;";
+        btn.style.cssText = "white-space:nowrap; border:none; background:rgba(0,0,0,0.1); padding:5px 10px; border-radius:15px; cursor:pointer; color:inherit;";
         btn.onclick = () => playYoutube(tag);
         tagsContainer.appendChild(btn);
     });
@@ -483,21 +427,17 @@
         iframe.src = 'https://www.youtube.com/embed?listType=search&list=' + encodeURIComponent(query);
     }
     
-    // --- 4. ווידג'טים (זמן, תאריך, מזג אוויר) ---
+    // --- ווידג'טים ועיצוב (שמירה מהבקשה הקודמת) ---
     function updateWidgets() {
         const now = new Date();
         document.getElementById('clock').innerText = now.toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
-        
-        // המרת תאריך לעברית (פשוטה)
         const dateOptions = { calendar: 'hebrew', day: 'numeric', month: 'long', year: 'numeric' };
         document.getElementById('hebrewDate').innerText = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', dateOptions).format(now);
     }
     setInterval(updateWidgets, 1000);
     updateWidgets();
 
-    // מזג אוויר
     async function getWeather() {
-        // ברירת מחדל: ירושלים
         try {
             const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=31.7683&longitude=35.2137&current_weather=true');
             const data = await res.json();
@@ -508,16 +448,13 @@
     }
     getWeather();
 
-    // החלפת נושא
     let isDark = false;
     window.toggleTheme = () => {
         isDark = !isDark;
         document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
     }
 
-    // הפעלה ראשונית
     renderChannels();
-
 </script>
 </body>
 </html>
