@@ -3,298 +3,431 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>נגן מיוזיק פלוס</title>
+    <title>Windows Music Player</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600&family=Segoe+UI&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
-            --primary-color: #6c5ce7;
-            --secondary-color: #a29bfe;
-            --bg-color: #dfe6e9;
-            --card-bg: #ffffff;
-            --text-color: #2d3436;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --primary-accent: #0078d4; /* Windows 11 Blue */
+            --text-main: #202020;
+            --text-secondary: #5d5d5d;
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.05);
+            --shadow-lg: 0 8px 20px rgba(0,0,0,0.1);
+            --radius: 8px;
+        }
+
+        /* מצב כהה (יופעל דינמית) */
+        [data-theme="dark"] {
+            --glass-bg: rgba(32, 32, 32, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-secondary: #cccccc;
+            --primary-accent: #60cdff;
         }
 
         body {
-            font-family: 'Heebo', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             margin: 0;
-            padding: 20px;
-            color: var(--text-color);
+            font-family: 'Segoe UI', 'Heebo', sans-serif;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             min-height: 100vh;
-            box-sizing: border-box;
+            transition: background-image 0.5s ease;
+            color: var(--text-main);
+            overflow-x: hidden;
         }
 
-        .app-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
-            padding-bottom: 20px;
-        }
-
-        header {
-            background: var(--primary-color);
-            color: white;
-            padding: 20px;
-            text-align: center;
+        /* אפקט הזכוכית הראשי (Mica Effect) */
+        .app-wrapper {
+            max-width: 900px;
+            margin: 40px auto;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            padding: 30px;
             position: relative;
         }
 
-        header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 700;
+        /* כותרת ושליטה */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
         }
 
-        /* אזור הנגן */
-        .player-wrapper {
+        h1 { margin: 0; font-weight: 600; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
+        
+        .controls-top button {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+        .controls-top button:hover { background: rgba(0,0,0,0.05); }
+
+        /* עיצוב הנגן */
+        .player-card {
+            background: rgba(255,255,255,0.3);
+            border-radius: var(--radius);
             padding: 20px;
             text-align: center;
-        }
-
-        .visualizer {
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            margin-bottom: 20px;
-        }
-
-        .bar {
-            width: 8px;
-            background: var(--primary-color);
-            border-radius: 5px;
-            animation: bounce 1s infinite ease-in-out;
+            margin-bottom: 30px;
         }
         
-        /* אנימציה ויזואלית */
-        @keyframes bounce {
-            0%, 100% { height: 10px; opacity: 0.5; }
-            50% { height: 40px; opacity: 1; }
-        }
-        .bar:nth-child(2) { animation-delay: 0.1s; }
-        .bar:nth-child(3) { animation-delay: 0.2s; }
-        .bar:nth-child(4) { animation-delay: 0.3s; }
-        .bar:nth-child(5) { animation-delay: 0.4s; }
-
-        .status-text {
-            font-size: 0.9rem;
-            color: #636e72;
-            margin-bottom: 15px;
-            font-weight: 500;
+        .now-playing-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-accent);
         }
 
         audio {
             width: 100%;
-            outline: none;
-            border-radius: 30px;
+            margin-top: 10px;
+            height: 40px;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
         }
 
-        /* רשימת ערוצים */
-        .section-title {
-            padding: 0 20px;
-            font-size: 1.1rem;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            border-right: 4px solid var(--primary-color);
+        /* גריד ערוצים */
+        .section-header {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .channel-grid {
+        .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
-            padding: 0 20px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 30px;
         }
 
-        .channel-btn {
-            background: #f1f2f6;
-            border: 1px solid #ced6e0;
-            border-radius: 12px;
+        .win-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
             padding: 15px;
+            border-radius: var(--radius);
             cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
             text-align: center;
+            transition: all 0.2s ease;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            box-shadow: var(--shadow-sm);
         }
 
-        .channel-btn:hover {
-            background: var(--secondary-color);
-            color: white;
+        .win-btn:hover {
+            background: rgba(255,255,255,0.5);
             transform: translateY(-2px);
+            border-color: var(--primary-accent);
         }
 
-        .channel-btn.active {
-            background: var(--primary-color);
+        .win-btn.active {
+            background: var(--primary-accent);
             color: white;
-            border-color: var(--primary-color);
-            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+            border-color: var(--primary-accent);
         }
 
-        /* אזור יוטיוב */
-        .youtube-tags {
+        .win-btn i {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+
+        /* אזור יוטיוב והוספה */
+        .youtube-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .win-input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.5);
+            color: var(--text-main);
+            font-family: inherit;
+            outline: none;
+        }
+        .win-input:focus {
+            border-bottom: 2px solid var(--primary-accent);
+            background: rgba(255,255,255,0.8);
+        }
+
+        .action-btn {
+            background: var(--primary-accent);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        /* תגיות */
+        .tags-cloud {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            padding: 0 20px;
             margin-bottom: 15px;
         }
 
-        .tag-btn {
-            background: white;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 6px 14px;
-            border-radius: 20px;
+        .tag-chip {
+            background: rgba(120, 120, 120, 0.1);
+            padding: 5px 12px;
+            border-radius: 16px;
             font-size: 0.85rem;
             cursor: pointer;
+            border: 1px solid transparent;
             transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .tag-btn:hover {
-            background: var(--primary-color);
-            color: white;
+        .tag-chip:hover {
+            background: rgba(120, 120, 120, 0.2);
+            border-color: var(--glass-border);
         }
-
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%; /* יחס 16:9 */
-            height: 0;
-            overflow: hidden;
-            margin: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        
+        .delete-tag {
+            font-size: 0.8rem;
+            color: #ff4d4d;
+            padding: 2px;
+            border-radius: 50%;
         }
+        .delete-tag:hover { background: rgba(255,0,0,0.1); }
 
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .video-frame {
             width: 100%;
-            height: 100%;
+            aspect-ratio: 16/9;
+            border-radius: var(--radius);
+            border: none;
+            box-shadow: var(--shadow-lg);
+            background: black;
+        }
+
+        /* תפריט רקעים */
+        .bg-menu {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            padding: 15px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            display: none;
+            z-index: 100;
+            border: 1px solid var(--glass-border);
+        }
+        .bg-menu.show { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .bg-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="app-wrapper">
     <header>
-        <h1>🎵 מיוזיק פלוס</h1>
+        <h1><i class="fab fa-windows" style="color: var(--primary-accent);"></i> נגן מיוזיק</h1>
+        <div class="controls-top">
+            <button onclick="toggleBgMenu()" title="שנה רקע"><i class="fas fa-palette"></i></button>
+        </div>
     </header>
 
-    <div class="player-wrapper">
-        <div class="visualizer" id="visualizer" style="opacity: 0.3;">
-            <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-        </div>
-        
-        <div id="current-playing" class="status-text">בחר ערוץ להאזנה</div>
+    <div class="bg-menu" id="bgMenu">
+        <div class="bg-option" style="background: #eef2f3;" onclick="setBg('light')"></div>
+        <div class="bg-option" style="background: #2d3436;" onclick="setBg('dark')"></div>
+        <div class="bg-option" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onclick="setBg('purple')"></div>
+        <div class="bg-option" style="background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);" onclick="setBg('blue')"></div>
+        <div class="bg-option" style="background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop'); background-size: cover;" onclick="setBg('abstract')"></div>
+    </div>
+
+    <div class="player-card">
+        <div class="now-playing-title" id="statusText">בחר ערוץ או פלייליסט</div>
         <audio id="audioPlayer" controls></audio>
     </div>
 
-    <div class="section-title">ערוצים חיים</div>
-    <div class="channel-grid" id="channels-container">
+    <div class="section-header"><i class="fas fa-broadcast-tower"></i> תחנות רדיו - קול חי</div>
+    <div class="grid-container" id="channelGrid">
         </div>
 
-    <div class="section-title">חיפוש שירים מהיר</div>
-    <div class="youtube-tags" id="tags-container">
-        </div>
+    <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 30px 0;">
 
-    <div class="video-container">
-        <iframe id="youtubeFrame" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <div class="section-header"><i class="fab fa-youtube"></i> חיפוש ופלייליסטים</div>
+    
+    <div class="youtube-controls">
+        <input type="text" id="newTagName" class="win-input" placeholder="שם הפלייליסט (למשל: מוטי שטיינמץ)">
+        <button onclick="addCustomTag()" class="action-btn"><i class="fas fa-plus"></i> הוסף</button>
     </div>
+
+    <div class="tags-cloud" id="tagsContainer">
+        </div>
+
+    <iframe id="youtubeFrame" class="video-frame" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <script>
-    // --- הגדרות נתונים ---
-    
-    // רשימת הערוצים (ניתן להוסיף עוד ערוצים לפי אותו מבנה)
+    // --- 1. הגדרות ערוצים ---
     const channels = [
-        { id: 27, name: "קול חי מיוזיק" },
-        { id: 26, name: "קול פליי" },
-        { id: 28, name: "ערוץ הלהיטים" },
-        { id: 75, name: "מיוזיק - קצב" },
-        { id: 77, name: "מיוזיק - רגש" }
+        { id: 27, name: "קול חי - ראשי", icon: "fa-microphone-alt" },
+        { id: 26, name: "קול חי מיוזיק", icon: "fa-music" },
+        { id: 28, name: "קול פליי (להיטים)", icon: "fa-star" },
+        { id: 75, name: "ערוץ הקצב", icon: "fa-drum" },
+        { id: 77, name: "ערוץ הרגש", icon: "fa-heart" },
+        { id: 29, name: "שיעורי תורה", icon: "fa-book-open" } 
     ];
 
-    // רשימת תגיות לחיפוש (הוסרו תגיות שאינן עומדות בהנחיות)
-    const tags = [
-        "חסידי מזרחי",
-        "מוזיקה ישראלית",
-        "שירים שקטים",
-        "מחרוזת ריקודים",
-        "שירי נשמה",
-        "להיטים חדשים"
-    ];
+    // --- 2. ניהול נגן רדיו (HLS) ---
+    const audio = document.getElementById('audioPlayer');
+    const statusText = document.getElementById('statusText');
+    const hls = new Hls();
 
-    // --- לוגיקת נגן (HLS) ---
-    var audio = document.getElementById('audioPlayer');
-    var visualizer = document.getElementById('visualizer');
-    var hls = new Hls();
-
-    function playStream(id, btnElement, name) {
-        var streamUrl = 'https://live.kcm.fm/' + id + '/hls.m3u8';
-        var statusText = document.getElementById('current-playing');
+    function playStream(id, name) {
+        const url = `https://live.kcm.fm/${id}/hls.m3u8`;
+        statusText.innerText = 'מנגן כעת: ' + name;
         
-        // עדכון ממשק משתמש
-        statusText.innerText = 'טוען: ' + name + '...';
-        
-        // סימון הכפתור הפעיל
-        document.querySelectorAll('.channel-btn').forEach(btn => btn.classList.remove('active'));
-        if(btnElement) btnElement.classList.add('active');
+        // סימון ויזואלי
+        document.querySelectorAll('.win-btn').forEach(b => b.classList.remove('active'));
+        event.currentTarget.classList.add('active');
 
         if (Hls.isSupported()) {
-            hls.loadSource(streamUrl);
+            hls.loadSource(url);
             hls.attachMedia(audio);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                audio.play();
-                updateStatus(name);
-            });
+            hls.on(Hls.Events.MANIFEST_PARSED, () => audio.play());
         } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
-            audio.src = streamUrl;
-            audio.addEventListener('loadedmetadata', function() {
-                audio.play();
-                updateStatus(name);
-            });
+            audio.src = url;
+            audio.addEventListener('loadedmetadata', () => audio.play());
         }
     }
 
-    function updateStatus(name) {
-        document.getElementById('current-playing').innerText = 'מנגן כעת: ' + name;
-        visualizer.style.opacity = "1"; // הפעלת האנימציה
-    }
-
-    // יצירת כפתורי ערוצים
-    const channelContainer = document.getElementById('channels-container');
+    // יצירת כפתורי הערוצים
+    const grid = document.getElementById('channelGrid');
     channels.forEach(ch => {
-        let btn = document.createElement('div');
-        btn.className = 'channel-btn';
-        btn.innerText = ch.name;
-        btn.onclick = function() { playStream(ch.id, this, ch.name); };
-        channelContainer.appendChild(btn);
+        const btn = document.createElement('div');
+        btn.className = 'win-btn';
+        btn.innerHTML = `<i class="fas ${ch.icon}"></i>${ch.name}`;
+        btn.onclick = (e) => playStream(ch.id, ch.name);
+        grid.appendChild(btn);
     });
 
-    // --- לוגיקת יוטיוב ---
-    const tagContainer = document.getElementById('tags-container');
+    // --- 3. ניהול יוטיוב + LocalStorage ---
+    const defaultTags = ["חסידי מזרחי", "פריד ומרדכי", "מחרוזת חתונה", "שירי שבת", "ווקאלי"];
+    let userTags = JSON.parse(localStorage.getItem('myMusicTags')) || defaultTags;
+    
+    const tagsContainer = document.getElementById('tagsContainer');
     const iframe = document.getElementById('youtubeFrame');
 
-    tags.forEach(tag => {
-        let btn = document.createElement('button');
-        btn.className = 'tag-btn';
-        btn.innerText = tag;
-        btn.onclick = () => {
-            // חיפוש ביוטיוב
-            iframe.src = 'https://www.youtube.com/embed?listType=search&list=' + encodeURIComponent(tag);
-        };
-        tagContainer.appendChild(btn);
-    });
-    
-    // טעינה ראשונית (לא מנגן אוטומטית כדי למנוע חסימת דפדפן)
-    iframe.src = 'https://www.youtube.com/embed?listType=search&list=' + encodeURIComponent(tags[0]);
+    function renderTags() {
+        tagsContainer.innerHTML = '';
+        userTags.forEach((tag, index) => {
+            const chip = document.createElement('div');
+            chip.className = 'tag-chip';
+            
+            // טקסט לחיפוש
+            const span = document.createElement('span');
+            span.innerText = tag;
+            span.onclick = () => {
+                iframe.src = 'https://www.youtube.com/embed?listType=search&list=' + encodeURIComponent(tag);
+                statusText.innerText = 'YouTube: ' + tag;
+            };
+            
+            // כפתור מחיקה (רק למשתמש, לא לברירת מחדל אם תרצה)
+            const del = document.createElement('i');
+            del.className = 'fas fa-times delete-tag';
+            del.onclick = (e) => {
+                e.stopPropagation(); // שלא יפעיל את הנגן
+                removeTag(index);
+            };
+
+            chip.appendChild(span);
+            chip.appendChild(del);
+            tagsContainer.appendChild(chip);
+        });
+    }
+
+    function addCustomTag() {
+        const input = document.getElementById('newTagName');
+        const val = input.value.trim();
+        if (val) {
+            userTags.push(val);
+            localStorage.setItem('myMusicTags', JSON.stringify(userTags));
+            renderTags();
+            input.value = '';
+        }
+    }
+
+    function removeTag(index) {
+        if(confirm('למחוק את הפלייליסט מהרשימה?')) {
+            userTags.splice(index, 1);
+            localStorage.setItem('myMusicTags', JSON.stringify(userTags));
+            renderTags();
+        }
+    }
+
+    renderTags();
+
+    // --- 4. עיצוב ורקעים (Windows 11 Style) ---
+    function toggleBgMenu() {
+        document.getElementById('bgMenu').classList.toggle('show');
+    }
+
+    function setBg(type) {
+        const body = document.body;
+        const wrapper = document.querySelector('.app-wrapper');
+        
+        // איפוס הגדרות
+        wrapper.setAttribute('data-theme', 'light');
+        
+        if (type === 'light') {
+            body.style.backgroundImage = "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)";
+        } else if (type === 'dark') {
+            body.style.backgroundImage = "linear-gradient(135deg, #232526 0%, #414345 100%)";
+            wrapper.setAttribute('data-theme', 'dark');
+        } else if (type === 'purple') {
+            body.style.backgroundImage = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+            wrapper.setAttribute('data-theme', 'dark');
+        } else if (type === 'blue') {
+            body.style.backgroundImage = "linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)";
+        } else if (type === 'abstract') {
+            body.style.backgroundImage = "url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop')";
+            wrapper.setAttribute('data-theme', 'dark');
+        }
+        
+        document.getElementById('bgMenu').classList.remove('show');
+    }
+
+    // טעינת רקע ראשוני
+    setBg('abstract');
 
 </script>
 
