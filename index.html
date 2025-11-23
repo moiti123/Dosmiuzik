@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Windows 11 Music Station</title>
+    <title>Windows 11 Station Pro</title>
     
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -11,24 +11,22 @@
     
     <style>
         :root {
-            --mica-bg: rgba(255, 255, 255, 0.65);
+            --mica-bg: rgba(255, 255, 255, 0.7);
             --mica-border: rgba(255, 255, 255, 0.5);
             --surface: rgba(255, 255, 255, 0.85);
-            --primary: #0067c0; /* Windows 11 Blue */
+            --primary: #0067c0;
             --text: #1a1a1a;
-            --text-secondary: #5d5d5d;
             --radius: 8px;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --hamal-red: #d32f2f;
+            --danger: #d32f2f;
         }
 
         [data-theme="dark"] {
-            --mica-bg: rgba(32, 32, 32, 0.7);
+            --mica-bg: rgba(32, 32, 32, 0.75);
             --mica-border: rgba(255, 255, 255, 0.08);
-            --surface: rgba(45, 45, 45, 0.8);
+            --surface: rgba(45, 45, 45, 0.9);
             --primary: #60cdff;
             --text: #ffffff;
-            --text-secondary: #cccccc;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
@@ -37,7 +35,7 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', 'Heebo', sans-serif;
-            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop'); /* ברירת מחדל */
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -46,10 +44,10 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: background-image 0.5s ease-in-out;
+            transition: background-image 0.5s ease;
         }
 
-        /* אפקט זכוכית כללי (Mica Simulation) */
+        /* --- רכיבים כלליים --- */
         .glass-panel {
             background: var(--mica-bg);
             backdrop-filter: blur(20px) saturate(120%);
@@ -57,479 +55,474 @@
             border: 1px solid var(--mica-border);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
+            display: flex; flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 12px 15px;
+            font-weight: 700;
+            border-bottom: 1px solid var(--mica-border);
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.1);
         }
 
         /* --- Header --- */
         header {
             flex: 0 0 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px;
             background: var(--mica-bg);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--mica-border);
             z-index: 10;
         }
+        .header-tools { display: flex; align-items: center; gap: 15px; font-size: 0.9rem; }
+        .icon-btn { background: none; border: none; cursor: pointer; color: var(--text); font-size: 1.1rem; padding: 5px; border-radius: 4px; transition: 0.2s; }
+        .icon-btn:hover { background: rgba(128,128,128,0.2); }
 
-        .system-info { display: flex; align-items: center; gap: 15px; font-size: 0.9rem; }
-        .clock-display { font-weight: 600; font-size: 1.1rem; }
-        .weather-widget { cursor: pointer; display: flex; gap: 5px; align-items: center; background: rgba(0,0,0,0.05); padding: 4px 10px; border-radius: 4px; transition: 0.2s; }
-        .weather-widget:hover { background: rgba(0,0,0,0.1); }
-
-        .window-controls { display: flex; gap: 8px; }
-        .win-btn { 
-            background: transparent; border: none; padding: 6px; border-radius: 4px; 
-            cursor: pointer; color: var(--text); transition: 0.2s; 
+        /* --- אזור עליון (חיפוש וסימניות) --- */
+        .top-section {
+            flex: 0 0 auto;
+            padding: 20px 20px 0 20px;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
         }
-        .win-btn:hover { background: rgba(0,0,0,0.1); }
 
-        /* --- Main Layout --- */
-        .main-container {
+        .search-box {
+            width: 100%; max-width: 600px;
+            display: flex; align-items: center;
+            background: var(--surface);
+            border-radius: 25px;
+            padding: 0 15px; height: 45px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid var(--mica-border);
+        }
+        .search-input { flex: 1; border: none; background: transparent; font-size: 1rem; color: var(--text); margin: 0 10px; }
+
+        .bookmarks-bar {
+            width: 100%; max-width: 800px;
+            display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+            min-height: 35px;
+        }
+        .bookmark-chip {
+            background: var(--surface);
+            border: 1px solid var(--mica-border);
+            padding: 5px 12px; border-radius: 20px;
+            font-size: 0.85rem; cursor: pointer;
+            display: flex; align-items: center; gap: 6px;
+            transition: 0.2s;
+            text-decoration: none; color: var(--text);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .bookmark-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .bookmark-add { border-style: dashed; opacity: 0.7; }
+
+        /* --- Main Layout Grid --- */
+        .main-grid {
             flex: 1;
-            display: flex;
             padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr 250px; /* רדיו | וידאו | פרסומות */
             gap: 20px;
             overflow: hidden;
         }
 
-        /* --- Search Bar (Start Menu Style) --- */
-        .search-area {
-            position: absolute;
-            top: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 600px;
-            z-index: 5;
-        }
-        .search-box {
-            display: flex;
-            align-items: center;
-            background: var(--surface);
-            border-radius: 25px; /* עיגול מלא כמו בווינדוס 11 */
-            padding: 0 15px;
-            height: 45px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            border: 1px solid var(--mica-border);
-        }
-        .search-input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            font-size: 1rem;
-            color: var(--text);
-            margin: 0 10px;
-        }
-        .search-icon { color: var(--primary); font-size: 1.1rem; }
-
-        /* --- Panels --- */
-        .panel {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .panel-title {
-            padding: 15px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            border-bottom: 1px solid var(--mica-border);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255,255,255,0.1);
-        }
-        
-        /* Radio Section */
-        .radio-section { flex: 1; min-width: 320px; }
-        .channels-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-        }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: rgba(100,100,100,0.3); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(100,100,100,0.5); }
-
+        /* רדיו */
+        .channels-list { flex: 1; overflow-y: auto; padding: 10px; }
         .channel-item {
-            padding: 12px;
-            margin-bottom: 5px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.2s;
-            border: 1px solid transparent;
+            padding: 10px; margin-bottom: 5px; border-radius: 6px; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: 0.2s; border: 1px solid transparent;
         }
-        .channel-item:hover { background: rgba(255,255,255,0.3); }
-        .channel-item.active { 
-            background: rgba(0, 103, 192, 0.1); 
-            border-color: var(--primary);
-            font-weight: 600;
-        }
-        .channel-item.active i { color: var(--primary); }
+        .channel-item:hover { background: rgba(255,255,255,0.2); }
+        .channel-item.active { background: rgba(0, 103, 192, 0.15); border-color: var(--primary); font-weight: 600; }
+        .del-ch-btn { color: var(--danger); opacity: 0; transition: 0.2s; padding: 2px 6px; }
+        .channel-item:hover .del-ch-btn { opacity: 1; }
 
-        /* Player Controls */
-        .player-ui {
-            padding: 20px;
-            text-align: center;
-            background: rgba(0,0,0,0.03);
-            border-top: 1px solid var(--mica-border);
-        }
-        .play-btn-large {
-            width: 50px; height: 50px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 103, 192, 0.3);
-            transition: transform 0.1s;
-        }
-        .play-btn-large:active { transform: scale(0.95); }
-        
-        /* Video Section */
-        .video-section { flex: 2; }
-        .video-wrapper {
-            flex: 1;
-            background: #000;
-            position: relative;
-        }
+        /* נגן וידאו */
+        .video-container { flex: 1; background: #000; border-radius: 4px; overflow: hidden; }
         iframe { width: 100%; height: 100%; border: none; }
-
-        /* Tags for Youtube */
-        .tags-bar {
-            padding: 10px;
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            background: rgba(0,0,0,0.02);
+        
+        /* משבצת פרסומות */
+        .ads-panel {
+            text-align: center;
+            background: rgba(255,255,255,0.5);
+            display: flex; flex-direction: column;
         }
-        .tag-pill {
-            background: var(--surface);
-            border: 1px solid var(--mica-border);
-            padding: 5px 12px;
-            border-radius: 16px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: 0.2s;
-        }
-        .tag-pill:hover { background: var(--primary); color: white; border-color: var(--primary); }
-
-        /* --- Footer (Hamal News Ticker) --- */
-        .news-footer {
-            flex: 0 0 36px;
-            background: var(--hamal-red);
-            color: white;
-            display: flex;
-            align-items: center;
-            font-size: 0.95rem;
-            position: relative;
+        .ad-content {
+            flex: 1;
+            display: flex; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.05);
+            margin: 10px; border-radius: 4px; border: 1px dashed #aaa;
+            font-size: 0.9rem; color: #777;
             overflow: hidden;
+        }
+        /* לדוגמה אם תרצה לשים תמונה */
+        .ad-content img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        /* Footer Ticker */
+        .news-footer {
+            flex: 0 0 32px;
+            background: var(--danger); color: white;
+            display: flex; align-items: center;
+            position: relative; overflow: hidden;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
         }
-        .ticker-label {
-            background: #b71c1c;
-            padding: 0 15px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            font-weight: bold;
-            z-index: 2;
-        }
-        .ticker-content {
-            display: inline-block;
-            white-space: nowrap;
-            padding-left: 100%;
-            animation: ticker 30s linear infinite;
-        }
-        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(100%); } }
+        .ticker-wrap { width: 100%; overflow: hidden; white-space: nowrap; }
+        .ticker-move { display: inline-block; padding-left: 100%; animation: ticker 40s linear infinite; }
+        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
-        /* --- Settings Modal --- */
-        .modal-overlay {
-            display: none;
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
+        /* --- Modals --- */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 100;
+            justify-content: center; align-items: center;
             backdrop-filter: blur(5px);
         }
-        .settings-card {
-            width: 400px;
-            background: var(--surface);
-            padding: 25px;
-            border-radius: 12px;
+        .modal-content {
+            background: var(--surface); padding: 25px; border-radius: 12px;
+            width: 90%; max-width: 400px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            display: flex; flex-direction: column; gap: 15px;
         }
-        .setting-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-        .win-select {
-            width: 100%; padding: 8px; border-radius: 6px;
-            border: 1px solid #ccc; background: rgba(255,255,255,0.5);
-            font-family: inherit;
-        }
-        .wallpaper-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .wall-thumb {
-            height: 60px; border-radius: 6px; cursor: pointer;
-            background-size: cover; border: 2px solid transparent;
-        }
-        .wall-thumb.selected { border-color: var(--primary); }
+        .win-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
+        .win-btn { padding: 8px 15px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .win-btn.secondary { background: #ccc; color: #333; }
 
         /* Responsive */
         @media (max-width: 900px) {
-            .main-container { flex-direction: column; overflow-y: auto; padding-top: 60px; }
-            .radio-section, .video-section { min-height: 400px; flex: none; }
-            .search-area { width: 90%; top: 60px; position: relative; margin: 0 auto 10px auto; transform: none; left: 0; }
+            .main-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 400px auto; /* רדיו, וידאו, פרסומות */
+                overflow-y: auto; display: flex; flex-direction: column;
+            }
+            .radio-section, .video-section, .ads-panel { min-height: 300px; flex: none; }
+            .ads-panel { height: 150px; }
         }
     </style>
 </head>
 <body data-theme="light">
 
 <header>
-    <div class="system-info">
-        <div class="window-controls">
-            <button class="win-btn" onclick="toggleTheme()" title="מצב כהה/בהיר"><i class="fas fa-adjust"></i></button>
-            <button class="win-btn" onclick="openSettings()" title="הגדרות ורקעים"><i class="fas fa-cog"></i></button>
-        </div>
-        <div style="width: 1px; height: 20px; background: var(--mica-border); margin: 0 10px;"></div>
-        <div class="clock-display" id="clock">00:00</div>
-        <div class="weather-widget" onclick="openSettings()" title="לחץ לשינוי עיר">
-            <i class="fas fa-cloud-sun"></i>
-            <span id="weatherText">טוען...</span>
-        </div>
+    <div class="header-tools">
+        <div class="icon-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i></div>
+        <div class="icon-btn" onclick="openSettings()"><i class="fas fa-cog"></i> הגדרות</div>
+        <div style="width:1px; height:20px; background:#ccc; margin:0 5px;"></div>
+        <div id="clock" style="font-weight:600;">00:00</div>
+        <div id="weather" style="font-size:0.9rem; cursor:pointer;" onclick="openSettings()">טוען...</div>
     </div>
-    <div style="font-weight: 700; color: var(--primary);">Windows Music</div>
+    <div style="font-weight:700; color:var(--primary);">Windows Station</div>
 </header>
 
-<div class="search-area">
+<div class="top-section">
     <form class="search-box" onsubmit="searchGoogle(event)">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="googleQuery" class="search-input" placeholder="הקלד כאן לחיפוש..." required>
+        <i class="fas fa-search" style="color:var(--primary)"></i>
+        <input type="text" id="googleQuery" class="search-input" placeholder="חפש בגוגל..." required>
     </form>
+
+    <div class="bookmarks-bar" id="bookmarksContainer">
+        </div>
 </div>
 
-<div class="main-container">
-    
-    <div class="panel glass-panel radio-section">
-        <div class="panel-title">
-            <i class="fas fa-broadcast-tower" style="color:var(--primary)"></i> תחנות רדיו
+<div class="main-grid">
+    <div class="glass-panel radio-section">
+        <div class="panel-header">
+            <span><i class="fas fa-music"></i> ערוצי שמע</span>
+            <button class="icon-btn" onclick="openAddChannel()" title="הוסף ערוץ">+</button>
         </div>
+        <div class="channels-list" id="channelsList"></div>
         
-        <div class="channels-list" id="channelsList">
-            </div>
-
-        <div class="player-ui">
-            <h4 id="nowPlaying" style="margin: 0 0 10px 0; font-weight:500;">בחר ערוץ</h4>
-            <div style="display:flex; justify-content:center; align-items:center; gap:20px;">
-                <input type="range" min="0" max="1" step="0.1" value="1" oninput="audioEngine.volume = this.value" style="width:80px; accent-color: var(--primary);">
-                <button class="play-btn-large" onclick="togglePlay()" id="mainPlayBtn"><i class="fas fa-play"></i></button>
+        <div style="padding:15px; text-align:center; background:rgba(0,0,0,0.03); border-top:1px solid var(--mica-border);">
+            <div id="nowPlaying" style="font-size:0.9rem; margin-bottom:10px;">בחר ערוץ</div>
+            <div style="display:flex; justify-content:center; align-items:center; gap:15px;">
+                <input type="range" min="0" max="1" step="0.1" value="1" oninput="audioEngine.volume = this.value" style="width:80px">
+                <button onclick="togglePlay()" style="width:45px; height:45px; border-radius:50%; background:var(--primary); color:white; border:none; font-size:1.2rem; cursor:pointer;">
+                    <i id="playIcon" class="fas fa-play"></i>
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="panel glass-panel video-section">
-        <div class="panel-title">
-            <i class="fab fa-youtube" style="color:red"></i> נגן וידאו
+    <div class="glass-panel video-section">
+        <div class="panel-header">
+            <span><i class="fab fa-youtube" style="color:red;"></i> נגן וידאו</span>
         </div>
-        <div class="tags-bar" id="ytTags">
-            </div>
-        <div class="video-wrapper">
+        <div style="padding:10px; display:flex; gap:5px; overflow-x:auto;">
+            <button class="win-btn secondary" onclick="playYt('מוטי שטיינמץ')">חסידי</button>
+            <button class="win-btn secondary" onclick="playYt('שירי רגש')">רגש</button>
+            <button class="win-btn secondary" onclick="playYt('ווקאלי')">ווקאלי</button>
+            <button class="win-btn secondary" onclick="playYt('חב״ד ניגונים')">חב"ד</button>
+        </div>
+        <div class="video-container">
             <iframe id="youtubeFrame" src="about:blank" allowfullscreen></iframe>
         </div>
     </div>
 
+    <div class="glass-panel ads-panel">
+        <div class="panel-header">פרסומות</div>
+        <div class="ad-content">
+            <div>
+                <h3>שטח לפרסום</h3>
+                <p>צור קשר לפרטים</p>
+                <i class="fas fa-ad" style="font-size:2rem; opacity:0.3;"></i>
+            </div>
+        </div>
+        <div class="ad-content" style="flex:0 0 100px;">
+            <small>באנר תחתון</small>
+        </div>
+    </div>
 </div>
 
 <div class="news-footer">
-    <div class="ticker-label">מבזקי הגזרה</div>
-    <div class="ticker-content" id="newsTicker">
-        טוען עדכונים...
+    <div style="background:#b71c1c; padding:0 15px; z-index:2; height:100%; display:flex; align-items:center; font-weight:bold;">הגזרה - עדכונים</div>
+    <div class="ticker-wrap">
+        <div class="ticker-move" id="newsTicker">טוען חדשות...</div>
     </div>
 </div>
 
 <audio id="audioEngine"></audio>
 
-<div class="modal-overlay" id="settingsModal">
-    <div class="settings-card glass-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>הגדרות מערכת</h3>
-            <button onclick="closeSettings()" class="win-btn"><i class="fas fa-times"></i></button>
-        </div>
-        
-        <div class="setting-group">
-            <label>בחר עיר למזג האוויר:</label>
-            <select id="citySelect" class="win-select" onchange="changeCity()">
-                <option value="Jerusalem">ירושלים</option>
-                <option value="Tel Aviv">תל אביב</option>
-                <option value="Bnei Brak">בני ברק</option>
-                <option value="Haifa">חיפה</option>
-                <option value="Beersheba">באר שבע</option>
-                <option value="Safed">צפת</option>
-                <option value="Eilat">אילת</option>
-            </select>
-        </div>
-
-        <div class="setting-group">
-            <label>רקע שולחן העבודה:</label>
-            <div class="wallpaper-grid">
-                <div class="wall-thumb" style="background-image:url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300')" onclick="setWallpaper(this)"></div>
-                <div class="wall-thumb" style="background-image:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=300')" onclick="setWallpaper(this)"></div>
-                <div class="wall-thumb" style="background-image:url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=300')" onclick="setWallpaper(this)"></div>
-                <div class="wall-thumb" style="background-image:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=300')" onclick="setWallpaper(this)"></div>
-                <div class="wall-thumb" style="background-image:url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=300')" onclick="setWallpaper(this)"></div>
-                <div class="wall-thumb" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);" onclick="setWallpaper(this, true)"></div>
-            </div>
+<div class="modal" id="addChannelModal">
+    <div class="modal-content">
+        <h3>הוספת ערוץ שמע</h3>
+        <input type="text" id="newChName" class="win-input" placeholder="שם הערוץ">
+        <input type="text" id="newChUrl" class="win-input" placeholder="כתובת (m3u8)">
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <button class="win-btn secondary" onclick="document.getElementById('addChannelModal').style.display='none'">ביטול</button>
+            <button class="win-btn" onclick="saveNewChannel()">שמור</button>
         </div>
     </div>
 </div>
 
+<div class="modal" id="addBookmarkModal">
+    <div class="modal-content">
+        <h3>הוספת סימניה</h3>
+        <input type="text" id="bmName" class="win-input" placeholder="שם האתר">
+        <input type="text" id="bmUrl" class="win-input" placeholder="כתובת האתר (https://...)">
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <button class="win-btn secondary" onclick="document.getElementById('addBookmarkModal').style.display='none'">ביטול</button>
+            <button class="win-btn" onclick="saveNewBookmark()">שמור</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="settingsModal">
+    <div class="modal-content">
+        <h3>הגדרות מערכת</h3>
+        <label>בחר עיר:</label>
+        <select id="citySelect" class="win-input" onchange="saveSettings()">
+            <option value="Jerusalem">ירושלים</option>
+            <option value="Bnei Brak">בני ברק</option>
+            <option value="Tel Aviv">תל אביב</option>
+            <option value="Haifa">חיפה</option>
+            <option value="Safed">צפת</option>
+        </select>
+        
+        <label>רקע:</label>
+        <select id="bgSelect" class="win-input" onchange="saveSettings()">
+            <option value="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920">נוף הרים (ברירת מחדל)</option>
+            <option value="https://images.unsplash.com/photo-1477346611705-65d1883cee1e?q=80&w=1920">נוף כהה</option>
+            <option value="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?q=80&w=1920">טבע ירוק</option>
+            <option value="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1920">צבע אבסטרקטי</option>
+        </select>
+
+        <button class="win-btn" onclick="document.getElementById('settingsModal').style.display='none'">סגור</button>
+    </div>
+</div>
+
 <script>
-    // --- 1. ניהול תחנות רדיו ---
-    const channels = [
+    // --- נתונים התחלתיים ---
+    const defaultChannels = [
         { name: "קול חי מיוזיק", url: "https://live.kcm.fm/26/hls.m3u8" },
         { name: "קול חי - ראשי", url: "https://live.kcm.fm/27/hls.m3u8" },
         { name: "קול פליי", url: "https://live.kcm.fm/28/hls.m3u8" },
-        { name: "קול ברמה", url: "https://live.kol-barama.co.il/7/hls.m3u8" }, // עדכון לינק משוער
         { name: "ערוץ הקצב", url: "https://live.kcm.fm/75/hls.m3u8" },
-        { name: "ערוץ הרגש", url: "https://live.kcm.fm/77/hls.m3u8" }
+    ];
+    
+    const defaultBookmarks = [
+        { name: "Jumbomail", url: "https://www.jumbomail.me" },
+        { name: "Gmail", url: "https://mail.google.com" },
+        { name: "Chat GPT", url: "https://chatgpt.com" }
     ];
 
+    // --- טעינה ושמירה (localStorage) ---
+    let myChannels = JSON.parse(localStorage.getItem('myChannels')) || defaultChannels;
+    let myBookmarks = JSON.parse(localStorage.getItem('myBookmarks')) || defaultBookmarks;
+    let mySettings = JSON.parse(localStorage.getItem('mySettings')) || { city: 'Jerusalem', bg: '' };
+
+    function saveData() {
+        localStorage.setItem('myChannels', JSON.stringify(myChannels));
+        localStorage.setItem('myBookmarks', JSON.stringify(myBookmarks));
+        localStorage.setItem('mySettings', JSON.stringify(mySettings));
+    }
+
+    // --- רדיו ---
     const audio = document.getElementById('audioEngine');
-    const playBtnIcon = document.querySelector('#mainPlayBtn i');
     let hls = null;
 
     function renderChannels() {
         const list = document.getElementById('channelsList');
         list.innerHTML = '';
-        channels.forEach((ch, idx) => {
+        myChannels.forEach((ch, idx) => {
             const div = document.createElement('div');
             div.className = 'channel-item';
-            div.innerHTML = `<span>${ch.name}</span> <i class="fas fa-play-circle" style="opacity:0.5"></i>`;
-            div.onclick = () => playChannel(idx);
+            div.innerHTML = `
+                <div style="flex:1" onclick="playChannel(${idx})">${ch.name}</div>
+                ${idx >= defaultChannels.length ? `<i class="fas fa-trash del-ch-btn" onclick="deleteChannel(${idx})"></i>` : ''}
+            `;
             list.appendChild(div);
         });
     }
 
-    function playChannel(index) {
-        const channel = channels[index];
-        const url = channel.url;
-        
-        document.getElementById('nowPlaying').innerText = "מנגן כעת: " + channel.name;
+    function playChannel(idx) {
+        const ch = myChannels[idx];
+        document.getElementById('nowPlaying').innerText = "מנגן: " + ch.name;
         
         // סימון ויזואלי
         document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
-        document.getElementById('channelsList').children[index].classList.add('active');
+        document.getElementById('channelsList').children[idx].classList.add('active');
 
-        if (hls) hls.destroy();
-
+        if(hls) hls.destroy();
+        
         if (Hls.isSupported()) {
             hls = new Hls();
-            hls.loadSource(url);
+            hls.loadSource(ch.url);
             hls.attachMedia(audio);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                audio.play();
-                updatePlayIcon(true);
-            });
+            hls.on(Hls.Events.MANIFEST_PARSED, () => audio.play());
         } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
-            audio.src = url;
+            audio.src = ch.url;
             audio.play();
-            updatePlayIcon(true);
         }
+        document.getElementById('playIcon').className = "fas fa-pause";
     }
 
     function togglePlay() {
-        if (audio.paused) {
-            audio.play();
-            updatePlayIcon(true);
-        } else {
-            audio.pause();
-            updatePlayIcon(false);
+        if(audio.paused) { audio.play(); document.getElementById('playIcon').className = "fas fa-pause"; }
+        else { audio.pause(); document.getElementById('playIcon').className = "fas fa-play"; }
+    }
+
+    // ניהול הוספת ערוצים
+    function openAddChannel() { document.getElementById('addChannelModal').style.display = 'flex'; }
+    function saveNewChannel() {
+        const name = document.getElementById('newChName').value;
+        const url = document.getElementById('newChUrl').value;
+        if(name && url) {
+            myChannels.push({name, url});
+            saveData();
+            renderChannels();
+            document.getElementById('addChannelModal').style.display = 'none';
+        }
+    }
+    function deleteChannel(idx) {
+        if(confirm('למחוק את הערוץ?')) {
+            myChannels.splice(idx, 1);
+            saveData();
+            renderChannels();
         }
     }
 
-    function updatePlayIcon(isPlaying) {
-        playBtnIcon.className = isPlaying ? "fas fa-pause" : "fas fa-play";
+    // --- סימניות ---
+    function renderBookmarks() {
+        const container = document.getElementById('bookmarksContainer');
+        container.innerHTML = '';
+        myBookmarks.forEach((bm, idx) => {
+            const a = document.createElement('a');
+            a.className = 'bookmark-chip';
+            a.href = bm.url;
+            a.target = "_blank";
+            a.innerHTML = `
+                <i class="fas fa-globe"></i> ${bm.name} 
+                ${idx >= defaultBookmarks.length ? `<i class="fas fa-times" style="margin-right:5px; font-size:0.8rem; color:var(--danger);" onclick="deleteBookmark(event, ${idx})"></i>` : ''}
+            `;
+            container.appendChild(a);
+        });
+        // כפתור הוספה
+        const addBtn = document.createElement('div');
+        addBtn.className = 'bookmark-chip bookmark-add';
+        addBtn.innerHTML = '<i class="fas fa-plus"></i> הוסף';
+        addBtn.onclick = () => document.getElementById('addBookmarkModal').style.display = 'flex';
+        container.appendChild(addBtn);
     }
 
-    // --- 2. מזג אוויר וערים ---
-    const cities = {
-        "Jerusalem": { lat: 31.7683, lon: 35.2137, name: "ירושלים" },
-        "Tel Aviv": { lat: 32.0853, lon: 34.7818, name: "תל אביב" },
-        "Bnei Brak": { lat: 32.0849, lon: 34.8352, name: "בני ברק" },
-        "Haifa": { lat: 32.7940, lon: 34.9896, name: "חיפה" },
-        "Beersheba": { lat: 31.2518, lon: 34.7913, name: "באר שבע" },
-        "Safed": { lat: 32.9646, lon: 35.4960, name: "צפת" },
-        "Eilat": { lat: 29.5581, lon: 34.9482, name: "אילת" }
-    };
-
-    let currentCity = "Jerusalem";
-
-    async function fetchWeather() {
-        const city = cities[currentCity];
-        const el = document.getElementById('weatherText');
-        el.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        
-        try {
-            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current_weather=true`);
-            const data = await res.json();
-            el.innerText = `${city.name}: ${Math.round(data.current_weather.temperature)}°C`;
-        } catch(e) {
-            el.innerText = "שגיאה בטעינה";
+    function saveNewBookmark() {
+        const name = document.getElementById('bmName').value;
+        let url = document.getElementById('bmUrl').value;
+        if(name && url) {
+            if(!url.startsWith('http')) url = 'https://' + url;
+            myBookmarks.push({name, url});
+            saveData();
+            renderBookmarks();
+            document.getElementById('addBookmarkModal').style.display = 'none';
+            document.getElementById('bmName').value = '';
+            document.getElementById('bmUrl').value = '';
         }
     }
-
-    function changeCity() {
-        currentCity = document.getElementById('citySelect').value;
-        fetchWeather();
-        // שמירה בלוקל סטורג'
-        localStorage.setItem('prefCity', currentCity);
-    }
-
-    // --- 3. טיקר חדשות (סימולציה למבזקי הגזרה) ---
-    const newsUpdates = [
-        "דיווח ראשוני: חשש לאירוע בטחוני בדרום, הפרטים בבדיקה •",
-        "מזג האוויר: עליה בטמפרטורות צפויה בסוף השבוע •",
-        "כוחות הביטחון פועלים כעת בשומרון למעצר מבוקשים •",
-        "עדכוני תנועה: עומס כבד בכביש 1 למזרח •",
-        "לעדכונים שוטפים 24/7 הורידו את אפליקציית הגזרה או עקבו בטלגרם •"
-    ];
     
-    function startTicker() {
-        const content = document.getElementById('newsTicker');
-        // משכפל את התוכן כדי ליצור רצף ארוך
-        content.innerText = newsUpdates.join("   ") + "   " + newsUpdates.join("   ");
+    function deleteBookmark(e, idx) {
+        e.preventDefault(); // למנוע לחיצה על הקישור
+        if(confirm('למחוק סימניה זו?')) {
+            myBookmarks.splice(idx, 1);
+            saveData();
+            renderBookmarks();
+        }
     }
 
-    // --- 4. הגדרות ועיצוב ---
+    // --- הגדרות מערכת (עיר ורקע) ---
     function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
-    function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
+    function saveSettings() {
+        mySettings.city = document.getElementById('citySelect').value;
+        mySettings.bg = document.getElementById('bgSelect').value;
+        saveData();
+        applySettings();
+    }
     
-    function setWallpaper(el, isGradient = false) {
-        if(isGradient) {
-            document.body.style.backgroundImage = el.style.background;
-        } else {
-            // חילוץ ה-URL מהסטייל
-            const url = el.style.backgroundImage.slice(4, -1).replace(/"/g, "");
-            // החלפת רזולוציה לגדולה
-            const highRes = url.replace("w=300", "w=1920");
-            document.body.style.backgroundImage = `url('${highRes}')`;
-        }
-        // סימון בחירה
-        document.querySelectorAll('.wall-thumb').forEach(d => d.classList.remove('selected'));
-        el.classList.add('selected');
+    async function applySettings() {
+        // יישום רקע
+        if(mySettings.bg) document.body.style.backgroundImage = `url('${mySettings.bg}')`;
+        document.getElementById('bgSelect').value = mySettings.bg || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920";
+        document.getElementById('citySelect').value = mySettings.city;
+
+        // מזג אוויר
+        const cities = {
+            "Jerusalem": {lat:31.7683, lon:35.2137},
+            "Bnei Brak": {lat:32.0849, lon:34.8352},
+            "Tel Aviv": {lat:32.0853, lon:34.7818},
+            "Haifa": {lat:32.7940, lon:34.9896},
+            "Safed": {lat:32.9646, lon:35.4960}
+        };
+        const coords = cities[mySettings.city];
+        try {
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current_weather=true`);
+            const data = await res.json();
+            document.getElementById('weather').innerText = `${Math.round(data.current_weather.temperature)}°C`;
+        } catch(e) { document.getElementById('weather').innerText = "--"; }
     }
 
+    // --- חדשות הגזרה (RSS to JSON) ---
+    async function fetchNews() {
+        const ticker = document.getElementById('newsTicker');
+        try {
+            // שימוש בפרוקסי להמיר RSS ל-JSON כדי לעקוף חסימת דפדפן (CORS)
+            const proxyUrl = "https://api.rss2json.com/v1/api.json?rss_url=https://hagizra.news/feed/";
+            const res = await fetch(proxyUrl);
+            const data = await res.json();
+            
+            if(data.status === 'ok' && data.items.length > 0) {
+                const titles = data.items.map(item => `• ${item.title}`).join('   ');
+                // שכפול הטקסט כדי ליצור רצף
+                ticker.innerText = titles + "   " + titles;
+            } else {
+                ticker.innerText = "לא ניתן לטעון חדשות כרגע (נסה שוב מאוחר יותר) • ברוכים הבאים למערכת";
+            }
+        } catch(e) {
+            ticker.innerText = "הגזרה: המערכת מנסה להתחבר לשרת החדשות... • עדכוני מזג אוויר ומוזיקה פעילים כרגיל";
+            console.error("News Error:", e);
+        }
+    }
+
+    // --- כללי ---
     function toggleTheme() {
         const body = document.body;
-        const current = body.getAttribute('data-theme');
-        body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+        body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
 
     function searchGoogle(e) {
@@ -537,47 +530,22 @@
         const q = document.getElementById('googleQuery').value;
         if(q) window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
     }
-
-    // --- יוטיוב ---
-    const ytTags = ["מוטי שטיינמץ", "יעקב שוואקי", "מרדכי שפירא", "חיים ישראל", "ניגוני חב\"ד", "ווקאלי"];
-    const tagsContainer = document.getElementById('ytTags');
     
-    ytTags.forEach(tag => {
-        const btn = document.createElement('div');
-        btn.className = 'tag-pill';
-        btn.innerText = tag;
-        btn.onclick = () => {
-            document.getElementById('youtubeFrame').src = 'https://www.youtube.com/embed?listType=search&list=' + encodeURIComponent(tag);
-        };
-        tagsContainer.appendChild(btn);
-    });
+    function playYt(term) {
+        document.getElementById('youtubeFrame').src = 'https://www.youtube.com/embed?listType=search&list=' + encodeURIComponent(term);
+    }
 
-    // --- אתחול ---
+    // אתחול
     window.onload = () => {
         renderChannels();
+        renderBookmarks();
+        applySettings();
+        fetchNews(); // הפעלת החדשות
         
-        // טעינת עיר שמורה
-        const savedCity = localStorage.getItem('prefCity');
-        if(savedCity && cities[savedCity]) {
-            currentCity = savedCity;
-            document.getElementById('citySelect').value = savedCity;
-        }
-        
-        fetchWeather();
-        startTicker();
-        
-        // שעון
         setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
         }, 1000);
-    };
-
-    // סגירת מודל בלחיצה בחוץ
-    document.getElementById('settingsModal').addEventListener('click', (e) => {
-        if(e.target === document.getElementById('settingsModal')) closeSettings();
-    });
-
+    }
 </script>
 </body>
 </html>
